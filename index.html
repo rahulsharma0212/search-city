@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html {
+        font-size: 62.5%;
+        box-sizing: border-box;
+      }
+      *,
+      *::after,
+      *::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: inherit;
+      }
+      body {
+        background: #f8f9fa;
+        font-family: sans-serif;
+        color: #333;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+      }
+      .search-container {
+        width: 30rem;
+        height: 30rem;
+        display: block;
+        background-color: #f2f3f6;
+        border: 1px solid #d4d7e1;
+        border-radius: 3px;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 5px 10px rgb(0 0 0 / 5%);
+        overflow: hidden;
+        padding: 1.6rem;
+      }
+      .search-container__input {
+        width: 100%; /* calc(100% - 1.4rem); */
+        padding: 0.5rem;
+        font-size: 1.4rem;
+        border-radius: 3px;
+      }
+      .search-container__list-container {
+        overflow-y: auto;
+        overflow-x: hidden;
+        font-size: 1.4rem;
+        max-height: 90%;
+        margin-bottom: 2rem;
+      }
+      .search-container__list-container > ul {
+        list-style: none;
+      }
+      .search-container__list-item {
+        padding: 0.5rem 0.7rem;
+        border-bottom: 1px solid #ccc;
+      }
+      .search-container__list-item:hover {
+        background-color: #8e8585c2;
+        cursor: pointer;
+      }
+      .search-container__list-item:hover a {
+        color: #fff;
+      }
+
+      .search-container__list-item > a {
+        text-decoration: none;
+        color: #444;
+      }
+      .item-list-subtext {
+        font-size: 1rem;
+        color: grey;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-container__input"
+        placeholder="Search your city..."
+        id="input-city"
+      />
+      <div class="search-container__list-container">
+        <ul class="search-container__list" data-search-on-list="list">
+          <!-- <li class="search-container__list-item">
+            <a href="" class="list-item-link">Bridgeman Art Library</a>
+            <span class="item-list-subtext">(Leave)</span>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+    <script>
+      var cities;
+      function createlist(data) {
+        return (
+          '<li class="search-container__list-item">' +
+          '<a href="" class="list-item-link"> ' +
+          data.name +
+          " </a>" +
+          '<span class="item-list-subtext"> (' +
+          data.state +
+          ") </span>" +
+          "</li>"
+        );
+      }
+
+      function htmllist(arr) {
+        var html = "";
+        for (var i = 0; i < arr.length; i++) {
+          html += createlist(arr[i]);
+        }
+        document.querySelector("ul.search-container__list").innerHTML = html;
+      }
+      async function getCitiesData() {
+        var data = await fetch("/cities.json");
+        cities = await data.json();
+        htmllist(cities);
+      }
+      if (!cities) getCitiesData();
+
+      const inputField = document.getElementById("input-city");
+      if (inputField)
+        inputField.addEventListener("keyup", (e) => {
+          let city = inputField.value.toLowerCase();
+          let filterCity = cities.filter((c) => {
+            let check = new RegExp(city);
+            return (
+              check.test(c.name.toLowerCase()) ||
+              check.test(c.state.toLowerCase())
+            );
+          });
+          htmllist(filterCity);
+        });
+    </script>
+  </body>
+</html>
